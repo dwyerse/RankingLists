@@ -5,7 +5,7 @@ import Button from "@material-ui/core/Button";
 import TextField from '@material-ui/core/TextField';
 
 const INITIAL_STATE = {
-    item: '',
+    itemName: '',
     error: null,
 };
 
@@ -31,8 +31,8 @@ class ListAdd extends Component {
     onSubmit = event => {
 
         event.preventDefault();
-        const { item } = this.state;
-        this.props.firebase.pushData(item)
+        const { itemName } = this.state;
+        this.props.firebase.pushData(itemName,this.props.length)
 
     };
 
@@ -50,7 +50,7 @@ class ListAdd extends Component {
                 <div>
                     <TextField
                         variant="outlined"
-                        name="item"
+                        name="itemName"
                         label="New item"
                         style={textField}
                         onChange={this.onChange}

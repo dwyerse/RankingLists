@@ -43,8 +43,12 @@ const hidden = {
   display: 'none'
 }
 
-const indexStyle= {
-  float:'left'
+const indexStyle = {
+  float: 'left'
+}
+
+const posStyle = {
+  float: 'right'
 }
 
 class ListScreen extends Component {
@@ -64,18 +68,18 @@ class ListScreen extends Component {
 
     this.props.firebase.items().on('value', snapshot => {
       const usersObject = snapshot.val();
-
-      const usersList = Object.keys(usersObject).map(key => ({
-        ...usersObject[key],
-        uid: key,
-      }));
-
-      console.log(usersList)
-
+      var usersList = []
+      if (usersObject) {
+        usersList = Object.keys(usersObject).map(key => ({
+          ...usersObject[key],
+          uid: key,
+        }));
+      }
       this.setState({
         list: usersList,
         loading: false,
       });
+
     });
   }
 
@@ -114,7 +118,7 @@ class ListScreen extends Component {
           </Button>
         </Zoom>
         {!loading && <List style={getListStyle} isDragDisabled={isDragDisabled} list={list} />}
-        <ListAdd/>
+        <ListAdd length = {list.length}/>
       </div>
 
     )
@@ -191,10 +195,11 @@ class ListItem extends React.Component {
               provided.draggableProps.style
             )}
             className="item"
-          > 
+          >
 
-            <span style={indexStyle}>{this.props.index + 1}</span>  
-            <span>{this.props.item.item}</span>  
+            <span style={indexStyle}>{this.props.index + 1}</span>
+            <span>{this.props.item.itemName}</span>
+            <span style={posStyle}>{this.props.item.position + 1}</span>
 
           </div>
         )}

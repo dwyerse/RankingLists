@@ -42,13 +42,12 @@ class Firebase {
 
     users = () => this.db.ref('users');
 
-    item = iid => this.db.ref(`items/${iid}`);
-
     items = () => this.db.ref('items');
 
-    pushData = function (item) {
+    pushData = function (itemName,position) {
         this.db.ref('items').push({
-            item: item
+            itemName: itemName,
+            position:position
         }, function (error) {
             if (error) {
                 console.log(error)
