@@ -1,0 +1,9 @@
+.item {
+    font: 18px "quicksand";
+  text-align: center
+  }
+  
+  @font-face {
+    font-family: quicksand;
+    src: url(../../fonts/quicksand_light.ttf);
+  }
