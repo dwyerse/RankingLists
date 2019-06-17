@@ -1,9 +1,15 @@
+.rowC{
+  display: flex;
+  height: 100%;
+  align-items: flex-start
+}
+
 .item {
-    font: 18px "quicksand";
+  font: 18px "quicksand";
   text-align: center
-  }
+}
   
-  @font-face {
-    font-family: quicksand;
-    src: url(../../fonts/quicksand_light.ttf);
-  }
+@font-face {
+  font-family: quicksand;
+  src: url(../../fonts/quicksand_light.ttf);
+}

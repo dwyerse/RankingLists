@@ -9,7 +9,7 @@ import PasswordForgetPage from '../PasswordForget';
 import HomePage from '../Home';
 import AccountPage from '../Account';
 import AdminPage from '../Admin';
-import List from '../List';
+import ListScreen from '../List';
 import theme from '../../theme/colors'
 import { MuiThemeProvider} from '@material-ui/core/styles';
 
@@ -31,7 +31,7 @@ const App = () => (
           <Route path={ROUTES.SIGN_IN} component={SignInPage} />
           <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
           <Route path={ROUTES.HOME} component={HomePage} />
-          <Route path={ROUTES.LIST} component={List} />
+          <Route path={ROUTES.LIST} component={ListScreen} />
           <Route path={ROUTES.ACCOUNT} component={AccountPage} />
           <Route path={ROUTES.ADMIN} component={AdminPage} />
         </div>

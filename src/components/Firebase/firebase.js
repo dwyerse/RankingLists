@@ -44,10 +44,22 @@ class Firebase {
 
     items = () => this.db.ref('items');
 
-    pushData = function (itemName,position) {
+    newItemList = () => {
+        this.db.ref('items').push({1:1}).then((snap) => {
+            const key = snap.key
+            console.log("Key " + key)
+            return key;
+        })
+    }
+
+    removeItemList = (key) => {
+        this.db.ref('items').child(key).remove();
+    }
+
+    pushData = (itemName, position) => {
         this.db.ref('items').push({
             itemName: itemName,
-            position:position
+            position: position
         }, function (error) {
             if (error) {
                 console.log(error)
@@ -56,6 +68,11 @@ class Firebase {
             }
         });
     }
+
+    removeItem = (key, itemKey) => {
+        this.db.ref('items').child(key).child(itemKey).remove();
+    }
+
 }
 
 

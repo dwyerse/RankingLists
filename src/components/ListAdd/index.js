@@ -6,44 +6,39 @@ import TextField from '@material-ui/core/TextField';
 
 const INITIAL_STATE = {
     itemName: '',
+    itemValue: '',
     error: null,
 };
 
 const container = {
-    display: 'block',
+    display: 'flex',
 }
 
-const textField = {
-    marginTop: 10
-}
-
-const resetStyle = {
-    marginTop: 10,
+const addStyle = {
+    height: "100%",
+    marginLeft: '10px'
 }
 
 class ListAdd extends Component {
     constructor(props) {
         super(props);
-
         this.state = { ...INITIAL_STATE };
     }
 
     onSubmit = event => {
-
         event.preventDefault();
-        const { itemName } = this.state;
-        this.props.firebase.pushData(itemName,this.props.length)
-
+        const { itemValue } = this.state;
+        this.props.firebase.pushData(itemValue, this.props.length);
+        this.state.itemValue = ""
     };
 
     onChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
+        this.setState({ itemValue: event.target.value });
     };
 
     render() {
-        const { item, error } = this.state;
-
-        const isInvalid = item === '';
+        const { itemValue, error } = this.state;
+        const isInvalid = itemValue === '';
 
         return (
             <form style={container} onSubmit={this.onSubmit}>
@@ -52,13 +47,10 @@ class ListAdd extends Component {
                         variant="outlined"
                         name="itemName"
                         label="New item"
-                        style={textField}
+                        value={this.state.itemValue}
                         onChange={this.onChange}
                     />
-                </div>
-
-                <div>
-                    <Button style={resetStyle} variant="outlined" color="primary" disabled={isInvalid} type="submit">
+                    <Button style={addStyle} variant="outlined" color="primary" disabled={isInvalid} type="submit">
                         Add item
                     </Button>
                 </div>
