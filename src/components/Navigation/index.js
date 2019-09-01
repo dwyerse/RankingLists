@@ -39,7 +39,7 @@ const NavigationAuth = () => (
     <ListItem style={listItem} button component={Link} to={ROUTES.HOME}>
       <ListItemText primary={<Typography style={textColor}>Predict</Typography>}></ListItemText>
     </ListItem>
-    <ListItem style={listItem} button component={Link} to={ROUTES.LIST}>
+    <ListItem style={listItem} button component={Link} to={{ pathname: ROUTES.LIST, state: { listId: '-LnixdxyHbE9fZ4M4SUZ'} }}>
       <ListItemText primary={<Typography style={textColor}>List</Typography>}></ListItemText>
     </ListItem>
     <ListItem style={listItem} button component={Link} to={ROUTES.ACCOUNT}>

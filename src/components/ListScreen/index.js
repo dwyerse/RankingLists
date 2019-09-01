@@ -6,7 +6,6 @@ import Zoom from '@material-ui/core/Zoom';
 import { withFirebase } from '../Firebase';
 import ListAdd from '../ListAdd';
 import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
-import IconButton from '@material-ui/core/IconButton';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -101,7 +100,8 @@ class ListScreen extends Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    this.props.firebase.items().on('value', snapshot => {
+    console.log(this.props.location.state.listId)
+    this.props.firebase.itemsInList(this.props.location.state.listId).on('value', snapshot => {
 
       const usersObject = snapshot.val();
       var usersList = []
@@ -121,7 +121,7 @@ class ListScreen extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.items().off();
+    this.props.firebase.itemsInList(this.props.location.state.listId).off();
   }
 
   toggleEdit = () => {
@@ -164,10 +164,10 @@ class ListScreen extends Component {
   }
 
   render() {
-    const { isDragDisabled, isHidden, loading, list, list2 } = this.state;
+    const { isDragDisabled, isHidden, loading, list} = this.state;
     return (
       <div>
-        <ListAdd length={list.length} />
+        <ListAdd length={list.length} listId={this.props.location.state.listId} />
 
         <Zoom in={isHidden}>
           <Button variant="outlined" onClick={this.toggleEdit} color="primary" style={isHidden ? editStyle : hidden}>
@@ -199,9 +199,6 @@ class ListScreen extends Component {
 }
 
 class Positions extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
@@ -215,10 +212,6 @@ class Positions extends React.Component {
 }
 
 class List extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
@@ -242,10 +235,6 @@ class List extends React.Component {
 }
 
 class ListItem extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
@@ -272,9 +261,6 @@ class ListItem extends React.Component {
 
 class PositionItem extends React.Component {
 
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
       <div style={getPosItemStyle()} className="item">

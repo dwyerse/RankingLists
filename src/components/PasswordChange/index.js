@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { withFirebase } from '../Firebase';
 import Button from "@material-ui/core/Button";
 import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
 
 const INITIAL_STATE = {
   passwordOne: '',

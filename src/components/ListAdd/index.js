@@ -28,8 +28,10 @@ class ListAdd extends Component {
     onSubmit = event => {
         event.preventDefault();
         const { itemValue } = this.state;
-        this.props.firebase.pushData(itemValue, this.props.length);
-        this.state.itemValue = ""
+        this.props.firebase.addItem(this.props.listId,itemValue, this.props.length);
+        this.setState({
+            itemValue:""
+        })
     };
 
     onChange = event => {
