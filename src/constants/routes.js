@@ -4,5 +4,5 @@ export const SIGN_IN = '/signin';
 export const HOME = '/home';
 export const ACCOUNT = '/account';
 export const ADMIN = '/admin';
-export const LIST = '/list';
+export const LIST = '/list/:listId';
 export const PASSWORD_FORGET = '/pw-forget';

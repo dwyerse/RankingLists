@@ -1,37 +1,35 @@
-import React, { Component } from 'react';
-import { withAuthorization } from '../Session';
-import ListCreate from '../ListCreate';
-import Button from "@material-ui/core/Button";
+import React, { Component } from "react";
+import { withAuthorization } from "../Session";
+import ListCreate from "../ListCreate";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import { Link as RouterLink } from 'react-router-dom';
+import * as ROUTES from "../../constants/routes";
 
 class HomePage extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      list: [],
-    }
+      list: []
+    };
   }
   componentDidMount() {
     this.setState({ loading: true });
 
-    this.props.firebase.lists().on('value', snapshot => {
-      const listObj = snapshot.val();
-      console.log(listObj)
-      const listsList = []
+    this.props.firebase.lists().on("value", snapshot => {
+      const listsList = [];
 
       snapshot.forEach(element => {
-        console.log(element.val())
-        console.log(element.key)
-        const obj = { val: element.val(), key: element.key }
-        listsList.push(obj)
+        const obj = { val: element.val(), key: element.key };
+        listsList.push(obj);
       });
-
-      console.log(listsList)
 
       this.setState({
         list: listsList,
-        loading: false,
+        loading: false
       });
     });
   }
@@ -42,35 +40,61 @@ class HomePage extends Component {
     return (
       <div>
         <h1>Home Page</h1>
-        <p>The Home Page is accessible by every signed in user.</p>
+        <p>Create a new list.</p>
         <ListCreate />
-        {!loading && <List isDragDisabled={true} deleteActive={false} list={list} id={"main"} />}
+        {!loading && (
+          <MyList
+            isDragDisabled={true}
+            deleteActive={false}
+            list={list}
+            id={"main"}
+          />
+        )}
       </div>
-
     );
   }
 }
 
-
-class List extends React.Component {
-
+class MyList extends React.Component {
   componentWillReceiveProps() {
     console.log("List " + this.props.list);
   }
 
   onSubmit = key => {
-    console.log(key + " - pressed")
+    console.log(key.val.name + " - pressed");
   };
 
   render() {
     return (
-      <form  onSubmit={this.onSubmit}>
-        {this.props.list.map((item) => (
-          <Button onClick={() => { this.onSubmit(item.key) }} key={item.key}>{item.val}</Button>
+      <List component="nav" aria-label="main mailbox folders">
+        {this.props.list.map(item => (         
+          <ListItemLink to={`/list/${item.key}`} primary={item.val.name} />
         ))}
-      </form>
+      </List>
     );
   }
+}
+
+
+function ListItemLink(props) {
+  const { icon, primary, to } = props;
+
+  const renderLink = React.useMemo(
+    () =>
+      React.forwardRef((itemProps, ref) => (
+        <RouterLink to={to} {...itemProps} innerRef={ref} />
+      )),
+    [to],
+  );
+
+  return (
+    <li>
+      <ListItem button component={renderLink}>
+        {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+        <ListItemText primary={primary} />
+      </ListItem>
+    </li>
+  );
 }
 
 

@@ -48,7 +48,7 @@ class ListAdd extends Component {
                     <TextField
                         variant="outlined"
                         name="itemName"
-                        label="New item"
+                        label="New Item"
                         value={this.state.itemValue}
                         onChange={this.onChange}
                     />

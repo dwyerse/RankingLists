@@ -1,26 +1,22 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { withFirebase } from '../Firebase';
+import { withFirebase } from "../Firebase";
 import Button from "@material-ui/core/Button";
-import TextField from '@material-ui/core/TextField';
+import TextField from "@material-ui/core/TextField";
 
 const INITIAL_STATE = {
-  passwordOne: '',
-  passwordTwo: '',
-  error: null,
+  passwordOne: "",
+  passwordTwo: "",
+  error: null
 };
-
-const container = {
-  display: 'block',
-}
 
 const textField = {
   margin: 10
-}
+};
 
 const resetStyle = {
-  margin: 10,
-}
+  margin: 10
+};
 
 class PasswordChangeForm extends Component {
   constructor(props) {
@@ -51,40 +47,40 @@ class PasswordChangeForm extends Component {
   render() {
     const { passwordOne, passwordTwo, error } = this.state;
 
-    const isInvalid =
-      passwordOne !== passwordTwo || passwordOne === '';
+    const isInvalid = passwordOne !== passwordTwo || passwordOne === "";
 
     return (
-      <form style={container} onSubmit={this.onSubmit}>
-        <div>
-          <TextField
-            variant="outlined"
-            name="passwordOne"
-            label="New password"
-            value={passwordOne}
-            style={textField}
-            onChange={this.onChange}
-            type="password"
-          />
-        </div>
-        <div>
-          <TextField
-            name="passwordTwo"
-            variant="outlined"
-            value={passwordTwo}
-            style={textField}
-            onChange={this.onChange}
-            type="password"
-            label="Confirm New Password"
-          />
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", flex: 0.5 }}>
+        <TextField
+          variant="outlined"
+          name="passwordOne"
+          label="New password"
+          value={passwordOne}
+          style={textField}
+          onChange={this.onChange}
+          type="password"
+        />
+        <TextField
+          name="passwordTwo"
+          variant="outlined"
+          value={passwordTwo}
+          style={textField}
+          onChange={this.onChange}
+          type="password"
+          label="Confirm New Password"
+        />
 
-        <div>
-          <Button style={resetStyle} variant="outlined" color="primary" disabled={isInvalid} type="submit">
-            Reset My Password
-        </Button></div>
+        <Button
+          style={resetStyle}
+          variant="outlined"
+          color="primary"
+          disabled={isInvalid}
+          type="submit"
+        >
+          Reset My Password
+        </Button>
         {error && <p>{error.message}</p>}
-      </form>
+      </div>
     );
   }
 }

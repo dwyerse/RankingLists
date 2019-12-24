@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import './index.css';
+import "./index.css";
 import Button from "@material-ui/core/Button";
-import Zoom from '@material-ui/core/Zoom';
-import { withFirebase } from '../Firebase';
-import ListAdd from '../ListAdd';
-import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import Zoom from "@material-ui/core/Zoom";
+import ListAdd from "../ListAdd";
+import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
+import { withAuthorization } from "../Session";
+import Comments from "../Comments";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -21,8 +22,8 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   margin: `0 0 ${grid}px 0`,
   color: isDragging ? "#ff4400" : "grey",
   background: "white",
-  borderRadius: '5px',
-  border: isDragging ? '1px solid #ff4400' : '1px solid #888888',
+  borderRadius: "5px",
+  border: isDragging ? "1px solid #ff4400" : "1px solid #888888",
   ...draggableStyle
 });
 
@@ -32,96 +33,102 @@ const getPosItemStyle = (isDragging, draggableStyle) => ({
   margin: `0 0 ${grid}px 0`,
   color: isDragging ? "#ff4400" : "grey",
   background: "white",
-  borderRadius: '5px',
-  border: isDragging ? '1px solid #ff4400' : '1px solid #888888',
+  borderRadius: "5px",
+  border: isDragging ? "1px solid #ff4400" : "1px solid #888888",
   ...draggableStyle
 });
 
 const getPosListStyle = () => ({
   padding: grid,
-  paddingLeft: '0px',
-  borderRadius: '5px',
-  width: '5%',
+  paddingLeft: "0px",
+  borderRadius: "5px",
+  width: "5%"
 });
 
 const getListStyle = isDragDisabled => ({
   padding: grid,
-  borderRadius: '5px',
-  width: '40%',
-  border: isDragDisabled ? '' : '1px dashed #ff4400'
+  borderRadius: "5px",
+  width: "40%",
+  border: isDragDisabled ? "" : "1px dashed #ff4400"
 });
 
 const getDeleteStyle = (isDragDisabled, isDraggingOver) => ({
   padding: grid,
-  borderRadius: '5px',
-  width: '40%',
-  border: isDraggingOver ? '1px solid red' : isDragDisabled ? '' : '1px solid #888888',
-  textAlign: 'center',
-  marginLeft: '10px'
+  borderRadius: "5px",
+  width: "40%",
+  border: isDraggingOver
+    ? "1px solid red"
+    : isDragDisabled
+    ? ""
+    : "1px solid #888888",
+  textAlign: "center",
+  marginLeft: "10px"
 });
 
 const editStyle = {
   paddingLeft: grid,
   paddingRight: grid,
-  width: '40%',
+  width: "40%",
   padding: grid,
   marginBottom: 10,
   marginTop: 10
-}
+};
 
 const subButtonStyle = {
-  width: '20%',
+  width: "20%",
   padding: grid,
   marginRight: 10,
   marginBottom: 10,
   marginTop: 10
-}
+};
 
 const hidden = {
-  display: 'none'
-}
+  display: "none"
+};
 
 const getIconStyle = (isDragDisabled, isDraggingOver) => ({
-  color: isDraggingOver ? 'red' : 'grey',
-  display: isDragDisabled ? 'none' : ''
-})
+  color: isDraggingOver ? "red" : "grey",
+  display: isDragDisabled ? "none" : ""
+});
 
 class ListScreen extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       isDragDisabled: true,
       isHidden: true,
       loading: false,
-      list: []
-    }
+      list: [],
+      listName: ""
+    };
   }
 
   componentDidMount() {
     this.setState({ loading: true });
-    console.log(this.props.location.state.listId)
-    this.props.firebase.itemsInList(this.props.location.state.listId).on('value', snapshot => {
+    console.log(this.props);
+    this.props.firebase
+      .itemsInList(this.props.match.params.listId)
+      .on("value", snapshot => {
+        const usersObject = snapshot.child("list").val();
+        const name = snapshot.child("name").val();
+        var usersList = [];
+        if (usersObject) {
+          usersList = Object.keys(usersObject).map(key => ({
+            ...usersObject[key],
+            uid: key
+          }));
+        }
 
-      const usersObject = snapshot.val();
-      var usersList = []
-      if (usersObject) {
-        usersList = Object.keys(usersObject).map(key => ({
-          ...usersObject[key],
-          uid: key,
-        }));
-      }
-
-      this.setState({
-        list: usersList,
-        loading: false,
+        this.setState({
+          list: usersList,
+          listName: name,
+          loading: false
+        });
       });
-
-    });
   }
 
   componentWillUnmount() {
-    this.props.firebase.itemsInList(this.props.location.state.listId).off();
+    this.props.firebase.itemsInList(this.props.match.params.listId).off();
   }
 
   toggleEdit = () => {
@@ -129,9 +136,17 @@ class ListScreen extends Component {
       isDragDisabled: !state.isDragDisabled,
       isHidden: !state.isHidden
     }));
-  }
+  };
 
-  onDragEnd = (result) => {
+  onDone = () => {
+    this.toggleEdit();
+    this.props.firebase.setItemList(
+      this.props.match.params.listId,
+      this.state.list
+    );
+  };
+
+  onDragEnd = result => {
     const { source, destination } = result;
 
     if (!result.destination) {
@@ -139,72 +154,99 @@ class ListScreen extends Component {
     }
 
     if (source.droppableId === destination.droppableId) {
-
-      const items = reorder(
-        this.state.list,
-        source.index,
-        destination.index
-      );
+      const items = reorder(this.state.list, source.index, destination.index);
 
       this.setState({
         list: items
       });
-
-    } else if (destination.droppableId === 'delete') {
-
-      this.props.firebase.remove(this.state.list[source.index].uid);
-      const items = this.state.list.splice(source.index, 1);
-      let state = { items };
-      this.setState(state);
-
+    } else if (destination.droppableId === "delete") {
+      console.log(this.state.list);
+      const items = this.state.list;
+      items.splice(source.index, 1);
+      this.props.firebase.setItemList(this.props.match.params.listId, items);
+      this.setState();
+    } else {
+      console.log("Error");
     }
-    else {
-      console.log('Error')
-    }
-  }
+  };
 
   render() {
-    const { isDragDisabled, isHidden, loading, list} = this.state;
+    const { isDragDisabled, isHidden, loading, list } = this.state;
     return (
       <div>
-        <ListAdd length={list.length} listId={this.props.location.state.listId} />
+        <h1>{this.state.listName}</h1>
+        <ListAdd length={list.length} listId={this.props.match.params.listId} />
 
         <Zoom in={isHidden}>
-          <Button variant="outlined" onClick={this.toggleEdit} color="primary" style={isHidden ? editStyle : hidden}>
+          <Button
+            variant="outlined"
+            onClick={this.toggleEdit}
+            color="primary"
+            style={isHidden ? editStyle : hidden}
+          >
             Edit
           </Button>
         </Zoom>
         <Zoom in={!isHidden}>
-          <Button variant="outlined" onClick={this.toggleEdit} color="primary" style={!isHidden ? subButtonStyle : hidden}>
-            Cancel
+          <Button
+            variant="outlined"
+            onClick={this.onDone}
+            color="secondary"
+            style={!isHidden ? subButtonStyle : hidden}
+          >
+            Done
           </Button>
         </Zoom>
-        <Zoom in={!isHidden}>
-          <Button variant="outlined" onClick={this.toggleEdit} color="secondary" style={!isHidden ? subButtonStyle : hidden} >
-            Save
-         </Button>
-        </Zoom>
-        <div className='rowC'>
+        <div className="rowC">
           {loading && <div>Loading ...</div>}
           <DragDropContext onDragEnd={this.onDragEnd}>
-            {!loading && <Positions style={getPosListStyle} isDragDisabled={true} deleteActive={false} list={list} />}
-            {!loading && <List style={getListStyle} isDragDisabled={isDragDisabled} deleteActive={false} list={list} id={"standard"} />}
-            {!loading && <List style={getDeleteStyle} isDragDisabled={isDragDisabled} deleteActive={true} list={[]} id={"delete"} />}
-          </DragDropContext >
+            {!loading && (
+              <Positions
+                style={getPosListStyle}
+                isDragDisabled={true}
+                deleteActive={false}
+                list={list}
+              />
+            )}
+            {!loading && (
+              <List
+                style={getListStyle}
+                isDragDisabled={isDragDisabled}
+                deleteActive={false}
+                list={list}
+                id={"standard"}
+              />
+            )}
+            {!loading && (
+              <List
+                style={getDeleteStyle}
+                isDragDisabled={isDragDisabled}
+                deleteActive={true}
+                list={[]}
+                id={"delete"}
+              />
+            )}
+          </DragDropContext>
+        </div>
+        <div>
+          <Comments />
         </div>
       </div>
-
-    )
+    );
   }
 }
 
 class Positions extends React.Component {
-
   render() {
     return (
       <div style={getPosListStyle()}>
         {this.props.list.map((item, index) => (
-          <PositionItem isDragDisabled={this.props.isDragDisabled} key={index} item={item} index={index} />
+          <PositionItem
+            isDragDisabled={this.props.isDragDisabled}
+            key={index}
+            item={item}
+            index={index}
+          />
         ))}
       </div>
     );
@@ -212,7 +254,6 @@ class Positions extends React.Component {
 }
 
 class List extends React.Component {
-
   render() {
     return (
       <Droppable droppableId={this.props.id}>
@@ -220,12 +261,27 @@ class List extends React.Component {
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            style={this.props.style(this.props.isDragDisabled, snapshot.isDraggingOver)}
+            style={this.props.style(
+              this.props.isDragDisabled,
+              snapshot.isDraggingOver
+            )}
           >
             {this.props.list.map((item, index) => (
-              <ListItem isDragDisabled={this.props.isDragDisabled} key={item.uid} item={item} index={index} />
+              <ListItem
+                isDragDisabled={this.props.isDragDisabled}
+                key={item.uid}
+                item={item}
+                index={index}
+              />
             ))}
-            {this.props.deleteActive && <DeleteOutlinedIcon style={getIconStyle(this.props.isDragDisabled, snapshot.isDraggingOver)} />}
+            {this.props.deleteActive && (
+              <DeleteOutlinedIcon
+                style={getIconStyle(
+                  this.props.isDragDisabled,
+                  snapshot.isDraggingOver
+                )}
+              />
+            )}
             {provided.placeholder}
           </div>
         )}
@@ -235,10 +291,13 @@ class List extends React.Component {
 }
 
 class ListItem extends React.Component {
-
   render() {
     return (
-      <Draggable isDragDisabled={this.props.isDragDisabled} draggableId={this.props.item.uid} index={this.props.index}>
+      <Draggable
+        isDragDisabled={this.props.isDragDisabled}
+        draggableId={this.props.item.uid}
+        index={this.props.index}
+      >
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
@@ -250,24 +309,25 @@ class ListItem extends React.Component {
             )}
             className="item"
           >
-            <span>{this.props.item.itemName + " " + (this.props.item.position + 1)}</span>
-
+            <span>
+              {this.props.item.itemName + " " + (this.props.item.position + 1)}
+            </span>
           </div>
         )}
       </Draggable>
-    )
+    );
   }
 }
 
 class PositionItem extends React.Component {
-
   render() {
     return (
       <div style={getPosItemStyle()} className="item">
         <span>{this.props.index + 1}</span>
       </div>
-    )
+    );
   }
 }
+const condition = authUser => !!authUser;
 
-export default withFirebase(ListScreen);
+export default withAuthorization(condition)(ListScreen);

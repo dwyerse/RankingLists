@@ -1,7 +1,9 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
-  palette: {
+  typography: {
+    useNextVariants: true,
+  },  palette: {
     primary: {
       // light: will be calculated from palette.primary.main,
       main: '#ff4400',

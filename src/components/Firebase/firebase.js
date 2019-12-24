@@ -44,21 +44,24 @@ class Firebase {
 
     lists = () => this.db.ref('lists');
 
+    comments = (listId) => this.db.ref('comments').child(listId)
+    addComment = (listId ,comment) => this.db.ref('comments').child(listId).push(comment)
     itemsInList = (id) => this.db.ref('lists').child(id)
-
     newItemList = (listName) => {
-        this.db.ref('lists').push({name:listName,list:{}}).then((snap) => {
+        this.db.ref('lists').push({name:listName}).then((snap) => {
             const key = snap.key
             return key;
         })
     }
+    setItemList = (listId, newList) => this.db.ref('lists').child(listId).child('list').set(newList)
 
     removeItemList = (key) => {
         this.db.ref('lists').child(key).remove();
     }
 
     addItem = (listId,itemName, position) => {
-        this.db.ref('lists').child(listId).list.push({
+        console.log(listId)
+        this.db.ref('lists').child(listId).child('list').push({
             itemName: itemName,
             position: position
         }, function (error) {
@@ -71,7 +74,7 @@ class Firebase {
     }
 
     removeItem = (key, itemKey) => {
-        this.db.ref('lists').child(key).child(itemKey).remove();
+        this.db.ref('lists').child(key).child('list').child(itemKey).remove();
     }
 
 }

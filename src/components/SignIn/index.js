@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+import { compose } from "recompose";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
-import { SignUpLink } from '../SignUp';
-import { PasswordForgetLink } from '../PasswordForget';
-import { withFirebase } from '../Firebase/context';
-import * as ROUTES from '../../constants/routes';
+import { SignUpLink } from "../SignUp";
+import { PasswordForgetLink } from "../PasswordForget";
+import { withFirebase } from "../Firebase/context";
+import * as ROUTES from "../../constants/routes";
 
 const SignInPage = () => (
   <div>
@@ -17,9 +19,9 @@ const SignInPage = () => (
 );
 
 const INITIAL_STATE = {
-  email: '',
-  password: '',
-  error: null,
+  email: "",
+  password: "",
+  error: null
 };
 
 class SignInFormBase extends Component {
@@ -52,27 +54,39 @@ class SignInFormBase extends Component {
   render() {
     const { email, password, error } = this.state;
 
-    const isInvalid = password === '' || email === '';
+    const isInvalid = password === "" || email === "";
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
+      <form
+        onSubmit={this.onSubmit}
+        style={{ display: "flex" }}
+      >
+        <TextField
+          style={{ margin: 5 }}
+          variant="outlined"
           name="email"
           value={email}
           onChange={this.onChange}
           type="text"
-          placeholder="Email Address"
+          label="Email Address"
         />
-        <input
+        <TextField
+          style={{ margin: 5 }}
+          variant="outlined"
           name="password"
           value={password}
           onChange={this.onChange}
           type="password"
-          placeholder="Password"
+          label="Password"
         />
-        <button disabled={isInvalid} type="submit">
+        <Button
+          variant="outlined"
+          disabled={isInvalid}
+          type="submit"
+          style={{margin:5}}
+        >
           Sign In
-        </button>
+        </Button>
 
         {error && <p>{error.message}</p>}
       </form>
@@ -80,10 +94,7 @@ class SignInFormBase extends Component {
   }
 }
 
-const SignInForm = compose(
-  withRouter,
-  withFirebase,
-)(SignInFormBase);
+const SignInForm = compose(withRouter, withFirebase)(SignInFormBase);
 
 export default SignInPage;
 
